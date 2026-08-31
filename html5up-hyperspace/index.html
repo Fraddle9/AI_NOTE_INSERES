@@ -1,0 +1,1001 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="tr">
+	<head>
+		<title>CRM Analiz Portalı</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css?v=20260831d" />
+		<link rel="stylesheet" href="assets/css/stars.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<script>
+			(function () {
+				try {
+					if (localStorage.getItem('crm-tema') === 'acik') {
+						document.documentElement.classList.add('crm-tema-acik');
+					}
+				} catch (e) {}
+			})();
+		</script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				corePlugins: { preflight: false },
+				important: '.crm-tw'
+			};
+		</script>
+		<script src="assets/js/config.js?v=20260828a"></script>
+		<!-- Auth: token kontrolü ve fetch interceptor — diğer scriptlerden ÖNCE yüklenmeli -->
+		<script src="assets/js/auth.js?v=20260828s"></script>
+
+	</head>
+	<body class="is-preload crm-ops">
+
+		<!-- Açık tema `filter: invert()` SADECE bu kabuğa (#crm-app-shell)
+		     uygulanır; overlay'ler (drawer, modallar, starfield) BİLEREK
+		     bunun DIŞINDA tutulur. -->
+		<div class="starfield" aria-hidden="true">
+			<div class="stars"></div>
+			<div class="stars-mid"></div>
+			<div class="stars-far"></div>
+		</div>
+
+		<div id="crm-app-shell">
+
+		<nav id="crm-nav" class="crm-app-nav" aria-label="Ana menü">
+			<div class="crm-app-nav-brand">
+				<span class="icon solid fa-satellite-dish" aria-hidden="true"></span>
+				<strong>CRM Analiz</strong>
+			</div>
+			<ul class="crm-app-nav-list">
+				<li>
+					<button type="button" class="crm-app-nav-link is-active" data-view="gorusmeler" aria-current="page">
+						<span class="icon solid fa-home" aria-hidden="true"></span>
+						<span>Ana Sayfa</span>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="crm-app-nav-link" data-view="gorusme-listesi">
+						<span class="icon solid fa-comments" aria-hidden="true"></span>
+						<span>Görüşmeler</span>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="crm-app-nav-link" data-view="notlarim">
+						<span class="icon solid fa-sticky-note" aria-hidden="true"></span>
+						<span>Notlarım</span>
+						<span id="nav-badge-notlar" class="crm-nav-badge" hidden aria-hidden="true">0</span>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="crm-app-nav-link" data-view="gorevler">
+						<span class="icon solid fa-check-square" aria-hidden="true"></span>
+						<span>Görevler</span>
+						<span id="nav-badge-gorev" class="crm-nav-badge" hidden aria-hidden="true">0</span>
+					</button>
+				</li>
+				<li>
+					<button type="button" class="crm-app-nav-link" data-view="kurumlar">
+						<span class="icon solid fa-university" aria-hidden="true"></span>
+						<span>Kurumlar</span>
+					</button>
+				</li>
+				<li id="nav-li-urunler" hidden>
+					<button type="button" class="crm-app-nav-link" data-view="urunler">
+						<span class="icon solid fa-cubes" aria-hidden="true"></span>
+						<span>Ürünler</span>
+					</button>
+				</li>
+				<li id="nav-li-veritabani">
+					<button type="button" class="crm-app-nav-link" data-view="veritabani">
+						<span class="icon solid fa-table" aria-hidden="true"></span>
+						<span>Veritabanı</span>
+					</button>
+				</li>
+				<li id="nav-li-kullanici-yonetimi" hidden>
+					<button type="button" class="crm-app-nav-link" data-view="kullanici-yonetimi">
+						<span class="icon solid fa-users-cog" aria-hidden="true"></span>
+						<span>Kullanıcı Yönetimi</span>
+					</button>
+				</li>
+			</ul>
+			<button type="button" id="btn-nav-not-ekle" class="button primary icon solid fa-microphone crm-nav-not-ekle">
+				Not Ekle
+			</button>
+			<article id="nav-son-gorusme" class="crm-nav-last" data-list="gorusme" role="button" tabindex="0" title="Son görüşmeyi aç">
+				<span class="crm-nav-last-label">Son eklenen görüşme</span>
+				<strong id="nav-son-gorusme-ad">Veri bekleniyor...</strong>
+			</article>
+
+			<!-- Kullanıcı Bilgisi & Çıkış Yap -->
+			<div class="crm-nav-user" id="crm-nav-user">
+				<span class="crm-nav-user-icon icon solid fa-user-circle" aria-hidden="true"></span>
+				<div class="crm-nav-user-info">
+					<span class="crm-nav-user-label">Giriş yapıldı</span>
+					<strong id="crm-nav-user-name">—</strong>
+					<span id="crm-nav-user-kadi" class="crm-nav-user-kadi">—</span>
+				</div>
+				<div class="crm-nav-user-actions">
+					<button type="button" id="btn-profil-duzenle" class="crm-nav-sifre" title="Adımı Düzenle" aria-label="Adımı Düzenle">
+						<span class="icon solid fa-user-edit" aria-hidden="true"></span>
+					</button>
+					<button type="button" id="btn-sifre-degistir" class="crm-nav-sifre" title="Şifre Değiştir" aria-label="Şifre Değiştir">
+						<span class="icon solid fa-key" aria-hidden="true"></span>
+					</button>
+					<button type="button" id="btn-cikis" class="crm-nav-logout" title="Çıkış Yap" aria-label="Çıkış Yap">
+						<span class="icon solid fa-sign-out-alt" aria-hidden="true"></span>
+					</button>
+				</div>
+			</div>
+		</nav>
+		<div id="crm-nav-backdrop" class="crm-nav-backdrop" hidden></div>
+
+
+		<div class="crm-app-main">
+
+		<header id="header">
+			<button type="button" id="nav-toggle" class="crm-nav-toggle" aria-expanded="false" aria-controls="crm-nav" aria-label="Menüyü aç">
+				<span></span><span></span><span></span>
+			</button>
+			<a href="index.html" class="title">CRM Analiz Portalı</a>
+			<div class="crm-header-actions">
+				<div class="crm-bildirim" id="crm-bildirim">
+					<button type="button" id="bildirim-toggle" class="bildirim-toggle" aria-expanded="false" aria-controls="bildirim-panel" aria-label="Bildirimler" title="Bildirimler">
+						<span class="icon solid fa-bell bildirim-toggle-ikon" aria-hidden="true"></span>
+						<span id="bildirim-badge" class="bildirim-badge" hidden>0</span>
+					</button>
+				</div>
+				<button type="button" id="tema-toggle" class="tema-toggle" aria-pressed="false" aria-label="Açık temaya geç" title="Açık temaya geç">
+					<span class="icon solid fa-sun tema-toggle-ikon" aria-hidden="true"></span>
+				</button>
+			</div>
+		</header>
+
+		<div id="wrapper">
+			<section id="dash" class="wrapper style1" data-view-panel="gorusmeler">
+				<div class="inner">
+
+					<div id="global-stats" class="crm-stats" aria-label="Genel bakış">
+						<article class="crm-stat is-clickable" id="stat-kart-kurum" data-view-link="gorusme-listesi" role="button" tabindex="0">
+							<span class="icon solid fa-comments" aria-hidden="true"></span>
+							<div>
+								<span class="crm-stat-label">Görüşmeler</span>
+								<strong id="stat-kurum">Veri bekleniyor...</strong>
+							</div>
+						</article>
+						<article class="crm-stat is-clickable" id="stat-kart-urun" data-list="urun" role="button" tabindex="0">
+							<span class="icon solid fa-cubes" aria-hidden="true"></span>
+							<div>
+								<span class="crm-stat-label">En Popüler Ürün / Konu</span>
+								<strong id="stat-urun">Veri bekleniyor...</strong>
+							</div>
+						</article>
+						<article class="crm-stat is-clickable" id="stat-kart-gorusme" data-list="gorusme" role="button" tabindex="0">
+							<span class="icon solid fa-comments" aria-hidden="true"></span>
+							<div>
+								<span class="crm-stat-label">Son Görüşme</span>
+								<strong id="stat-gorusme">Veri bekleniyor...</strong>
+							</div>
+						</article>
+						<article class="crm-stat is-clickable" id="stat-kart-gorev" data-view-link="gorevler" role="button" tabindex="0">
+							<span class="icon solid fa-check-square" aria-hidden="true"></span>
+							<div>
+								<span class="crm-stat-label">Aktif Görev</span>
+								<strong id="stat-gorev">Veri bekleniyor...</strong>
+							</div>
+						</article>
+					</div>
+
+					<div class="crm-workbench">
+						<div class="crm-workbench-main">
+							<div id="dash-not-ekle-yuvasi">
+							<div id="not-ekle-blok">
+							<div class="crm-not-ekle-panel" id="crm-not-ekle-panel">
+								<header class="crm-not-ekle-head">
+									<span class="icon solid fa-microphone crm-not-ekle-icon" aria-hidden="true"></span>
+									<div>
+										<h3>Görüşme Notu Ekle</h3>
+										<p>Konuşun; metin yazılır. Durdurunca yapay zeka analiz eder. İsterseniz yazabilirsiniz.</p>
+									</div>
+								</header>
+							<form id="analiz-formu" class="crm-panel crm-panel-not">
+								<div class="crm-mic-hero">
+									<button type="button" id="btn-ses" class="button primary large icon solid fa-microphone crm-mic" aria-pressed="false">Konuşmaya başla</button>
+									<p id="ses-durumu" class="crm-status">Konuşmak için basın. Durdurunca not analiz edilir.</p>
+								</div>
+								<label class="crm-field-label" for="gorusme-metni">Notunuz</label>
+								<textarea id="gorusme-metni" name="metin" rows="7" placeholder="Konuşurken metin burada görünür. İsterseniz yazın…"></textarea>
+								<ul class="actions">
+									<li>
+										<button type="button" id="btn-analiz-et" class="button primary icon solid fa-save">Notu Kaydet ve Analiz Et</button>
+									</li>
+								</ul>
+							</form>
+							</div>
+
+							<div id="analiz-yukleniyor" class="crm-loading" hidden>
+								<span class="crm-spinner" aria-hidden="true"></span>
+								<span class="crm-loading-text">Analiz ediliyor...</span>
+							</div>
+
+							<div id="analiz-hata" class="box crm-alert" role="alert" hidden>
+								<strong>Uyarı</strong>
+								<p id="analiz-hata-metni"></p>
+							</div>
+							</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="crm-home-after-note">
+							<div id="analiz-ozet" class="crm-glance" hidden>
+								<article class="crm-card crm-glance-card" id="kart-durum" role="button" tabindex="0" aria-label="Görüşme detayını aç">
+									<span class="crm-card-label">Genel Durum</span>
+									<strong id="ozet-durum">—</strong>
+									<span id="ozet-durum-alt" class="crm-card-meta"></span>
+									<span class="crm-card-action">Detayı aç</span>
+								</article>
+							</div>
+					<div class="crm-quick-task-wrap" id="dash-gorev-composer">
+					<div id="dash-composer-tabs" class="crm-todo-composer-tabs" hidden role="group" aria-label="Görev ekleme türü">
+						<button type="button" class="crm-todo-kapsam-btn is-active" data-composer="kendime">Kendime görev</button>
+						<button type="button" class="crm-todo-kapsam-btn" data-composer="personele">Personele görev</button>
+					</div>
+					<div class="crm-quick-task-grid">
+					<section class="crm-quick-task" id="dash-hizli-gorev" aria-label="Kendime görev ekle">
+						<header class="crm-quick-task-head">
+							<span class="icon solid fa-user crm-quick-task-icon" aria-hidden="true"></span>
+							<div>
+								<h3>Kendime görev</h3>
+								<p>Size atanır; yalnızca siz görürsünüz.</p>
+							</div>
+						</header>
+						<form id="dash-hizli-gorev-form" class="crm-quick-task-form">
+							<input type="text" id="dash-hizli-gorev-baslik" placeholder="Örn: Teklifi maille gönder…" autocomplete="off" required />
+							<button type="submit" class="button primary icon solid fa-plus" id="dash-hizli-gorev-ekle">Ekle</button>
+						</form>
+					</section>
+
+					<section class="crm-quick-task" id="dash-personel-gorev" hidden aria-label="Personele görev ata">
+						<header class="crm-quick-task-head">
+							<span class="icon solid fa-user-plus crm-quick-task-icon" aria-hidden="true"></span>
+							<div>
+								<h3>Personele görev</h3>
+								<p>Önce ürün, sonra o ürünün şirketindeki çalışan.</p>
+							</div>
+						</header>
+						<form id="dash-personel-gorev-form" class="crm-quick-task-form">
+							<select id="dash-personel-urun" required aria-label="Ürün">
+								<option value="">Ürün seçin</option>
+							</select>
+							<select id="dash-personel-calisan" required aria-label="Çalışan" disabled>
+								<option value="">Önce ürün seçin</option>
+							</select>
+							<input type="text" id="dash-personel-baslik" placeholder="Görev metni…" autocomplete="off" required />
+							<button type="submit" class="button primary icon solid fa-plus" id="dash-personel-ekle">Ata</button>
+						</form>
+					</section>
+					</div>
+					</div>
+					</div>
+
+					<section class="crm-records crm-dash-meetings" aria-label="Son görüşmeler">
+						<header class="crm-records-head">
+							<div>
+								<h3>Son Görüşmeler</h3>
+								<p>Bir karta tıklayınca detay sağdan açılır. Tüm notlar için sol menüden <strong>Notlarım</strong>’a gidin.</p>
+							</div>
+							<button type="button" id="btn-kayit-ekle" class="button primary icon solid fa-plus crm-admin-only">Yeni Kayıt</button>
+						</header>
+						<div id="dash-kartlar" class="crm-card-grid"></div>
+						<table hidden aria-hidden="true">
+							<tbody id="kayit-tbody"></tbody>
+						</table>
+					</section>
+
+				</div>
+			</section>
+
+			<section id="gorusme-listesi-view" class="wrapper style1" data-view-panel="gorusme-listesi" hidden>
+				<div class="inner">
+					<section class="crm-records" aria-label="Görüşmeler">
+						<header class="crm-records-head">
+							<div>
+								<h3>Görüşmeler</h3>
+								<p>Kayıtlı görüşmelerin kurum, ürün ve durum özeti. Karta tıklayınca detay sağdan açılır.</p>
+							</div>
+						</header>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="gorusme-arama" placeholder="Kurum, ürün, durum veya not ara…" autocomplete="off" />
+							</label>
+							<select id="gorusme-filtre-durum" aria-label="Duruma göre filtrele">
+								<option value="">Tüm durumlar</option>
+								<option value="Olumlu">Olumlu</option>
+								<option value="Olumsuz">Olumsuz</option>
+								<option value="Karma">Karma</option>
+								<option value="Beklemede">Beklemede</option>
+							</select>
+							<select id="gorusme-filtre-surec" aria-label="Sürece göre filtrele">
+								<option value="">Tüm süreçler</option>
+								<option value="Deneme">Deneme</option>
+								<option value="Abonelik">Abonelik</option>
+								<option value="Hiçbiri">Hiçbiri</option>
+							</select>
+							<select id="gorusme-filtre-urun" aria-label="Ürüne göre filtrele">
+								<option value="">Tüm ürünler</option>
+							</select>
+							<select id="gorusme-siralama" aria-label="Sıralama">
+								<option value="tarih-desc">Tarih (yeniden eskiye)</option>
+								<option value="tarih-asc">Tarih (eskiden yeniye)</option>
+								<option value="kurum-asc">Kurum A–Z</option>
+								<option value="kurum-desc">Kurum Z–A</option>
+								<option value="durum-asc">Durum A–Z</option>
+								<option value="durum-desc">Durum Z–A</option>
+							</select>
+							<span id="gorusme-sonuc" class="crm-table-count"></span>
+						</div>
+						<div id="gorusme-kartlar" class="crm-card-grid crm-gorusme-grid"></div>
+					</section>
+				</div>
+			</section>
+
+			<section id="notlarim-view" class="wrapper style1" data-view-panel="notlarim" hidden>
+				<div class="inner">
+					<section class="crm-records crm-notlarim-page" aria-label="Görüşme notları">
+						<header class="crm-records-head">
+							<div>
+								<h3>Notlarım</h3>
+								<p>Görüşme notlarınız. Karta tıklayınca o kaydın metni ve görüşmeden çıkan görevler açılır. Yapılacakların tam listesi Görevler’dedir.</p>
+							</div>
+							<button type="button" id="btn-notlarim-ekle" class="button primary icon solid fa-edit">Yeni not ekle</button>
+						</header>
+						<div id="notlarim-not-ekle-yuvasi" class="crm-notlarim-ekle-yuvasi" hidden></div>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="notlar-arama" placeholder="Kurum veya not içeriği ara…" autocomplete="off" />
+							</label>
+							<span id="notlar-sonuc" class="crm-table-count"></span>
+						</div>
+						<div id="notlar-kartlar" class="crm-card-grid crm-notlar-grid"></div>
+					</section>
+				</div>
+			</section>
+
+			<section id="kurumlar-view" class="wrapper style1" data-view-panel="kurumlar" hidden>
+				<div class="inner">
+					<section class="crm-records" aria-label="Kurumlar">
+						<header class="crm-records-head">
+							<div>
+								<h3>Kurumlar</h3>
+								<p>Tüm kullanıcılar kurum listesini ve detayını görür. Satıra tıklayınca detay açılır. <span class="crm-readonly-hint">Standart kullanıcılar yalnızca görüntüleyebilir.</span></p>
+							</div>
+							<button type="button" id="btn-kurum-ekle" class="button primary icon solid fa-plus crm-admin-only">Yeni Kurum</button>
+						</header>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="kurum-arama" placeholder="Kurum adı, tarih veya durum ara…" autocomplete="off" />
+							</label>
+							<select id="kurum-filtre-durum" aria-label="Duruma göre filtrele">
+								<option value="">Tüm durumlar</option>
+								<option value="Olumlu">Olumlu</option>
+								<option value="Olumsuz">Olumsuz</option>
+								<option value="Karma">Karma</option>
+								<option value="Beklemede">Beklemede</option>
+							</select>
+							<span id="kurum-sonuc" class="crm-table-count"></span>
+						</div>
+						<div class="crm-tw crm-data-shell w-full">
+							<div class="crm-table-wrap w-full overflow-x-auto">
+								<table class="crm-table crm-table-wide crm-table-premium crm-data-table" id="kurum-tablosu">
+									<thead>
+										<tr>
+											<th><button type="button" class="crm-sort-btn" data-sort="ad">Kurum Adı <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="tarih">Eklenme Tarihi <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="urun" data-col-filter="urun">İlgilenilen Ürünler <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="durum" data-col-filter="durum">Durum <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="surec" data-col-filter="surec">Süreç <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+											<th class="crm-admin-only">İşlem</th>
+										</tr>
+									</thead>
+									<tbody id="kurum-kartlar">
+										<tr><td colspan="6">Kurumlar yükleniyor...</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+				</div>
+			</section>
+
+			<section id="urunler-view" class="wrapper style1" data-view-panel="urunler" hidden>
+				<div class="inner">
+					<section class="crm-records" aria-label="Ürünler">
+						<header class="crm-records-head">
+							<div>
+								<h3>Ürünler</h3>
+								<p>Sistem ürünleri. Satıra tıklayınca o ürünle ilgilenen kurumlar listelenir.</p>
+							</div>
+						</header>
+						<div class="crm-panel" id="yeni-urun-panel">
+							<h4 class="crm-kullanici-form-baslik"><span class="icon solid fa-plus"></span> Yeni Ürün Ekle</h4>
+							<form id="yeni-urun-form" class="crm-kullanici-form">
+								<label>
+									<span class="crm-field-label">Ürün adı</span>
+									<input type="text" id="yu-ad" required placeholder="Örn. Chatbot" autocomplete="off" />
+								</label>
+								<label>
+									<span class="crm-field-label">Kod (isteğe bağlı)</span>
+									<input type="text" id="yu-kod" placeholder="Boş bırakılırsa addan üretilir" autocomplete="off" />
+								</label>
+								<label>
+									<span class="crm-field-label">Şirket</span>
+									<select id="yu-sirket">
+										<option value="">Şirket seçin...</option>
+									</select>
+								</label>
+								<p id="yu-hata" class="crm-alert" hidden></p>
+								<ul class="actions">
+									<li><button type="submit" class="button primary icon solid fa-plus">Ekle</button></li>
+								</ul>
+							</form>
+						</div>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="urun-arama" placeholder="Ürün adı, kod veya şirket ara…" autocomplete="off" />
+							</label>
+							<span id="urun-sonuc" class="crm-table-count"></span>
+						</div>
+						<div class="crm-tw crm-data-shell w-full">
+							<div class="crm-table-wrap w-full overflow-x-auto">
+								<table class="crm-table crm-table-wide crm-table-premium crm-data-table" id="urun-tablosu">
+									<thead>
+										<tr>
+											<th></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="name">Ürün <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="code">Kod <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="company" data-col-filter="company">Şirket <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+											<th><button type="button" class="crm-sort-btn" data-sort="kurumSayisi">İlgilenen Kurum <span class="crm-sort-icon">↕</span></button></th>
+											<th>İşlem</th>
+										</tr>
+									</thead>
+									<tbody id="urun-tbody">
+										<tr><td colspan="6">Ürünler yükleniyor...</td></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+				</div>
+			</section>
+
+			<section id="gorevler-view" class="wrapper style1" data-view-panel="gorevler" hidden>
+				<div class="inner">
+					<aside class="crm-todo crm-todo-page" aria-label="Akıllı görev ve takip listesi">
+						<header>
+							<div class="crm-todo-page-head">
+								<div class="crm-todo-page-head-text">
+									<h3>Görevler</h3>
+									<p id="todo-aciklama">Yapılacaklar: atayın, tamamlayın, takip edin. Görüşme notları Notlarım’dadır.</p>
+								</div>
+								<button type="button" id="btn-gorevler-ekle" class="button primary icon solid fa-plus">Yeni ekle</button>
+							</div>
+							<div id="todo-kapsam" class="crm-todo-kapsam" hidden role="group" aria-label="Görev görünümü">
+								<button type="button" class="crm-todo-kapsam-btn is-active" data-kapsam="benim">Benim görevlerim</button>
+								<button type="button" class="crm-todo-kapsam-btn" data-kapsam="ekip_gorusmeleri">Personel görüşmeleri</button>
+							</div>
+						</header>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="gorev-arama" placeholder="Görev metni ara…" autocomplete="off" />
+							</label>
+							<select id="gorev-filtre-durum" aria-label="Görev durumu">
+								<option value="aktif">Aktif</option>
+								<option value="tamamlanan">Tamamlanan</option>
+								<option value="tumu">Tümü</option>
+							</select>
+							<select id="gorev-siralama" aria-label="Sıralama">
+								<option value="due-asc">Son tarih (yakın)</option>
+								<option value="due-desc">Son tarih (uzak)</option>
+								<option value="title-asc">Başlık A–Z</option>
+								<option value="title-desc">Başlık Z–A</option>
+								<option value="durum-asc">Bekleyen önce</option>
+								<option value="durum-desc">Tamamlanan önce</option>
+							</select>
+							<span id="gorev-sonuc" class="crm-table-count"></span>
+						</div>
+						<p id="todo-empty" class="crm-todo-empty">Henüz görev yok</p>
+						<ul id="todo-list" class="crm-todo-list"></ul>
+						<section id="todo-done-wrap" class="crm-todo-done" hidden>
+							<h4>Tamamlananlar</h4>
+							<p class="crm-todo-done-hint">Tiklenen görevler burada kalır, 2 hafta sonra kalkar.</p>
+							<ul id="todo-done-list" class="crm-todo-list is-done-list"></ul>
+						</section>
+						<div class="crm-todo-composer" id="todo-composer">
+							<div id="todo-composer-tabs" class="crm-todo-composer-tabs" hidden role="group" aria-label="Görev ekleme türü">
+								<button type="button" class="crm-todo-kapsam-btn is-active" data-composer="kendime">Kendime</button>
+								<button type="button" class="crm-todo-kapsam-btn" data-composer="personele">Personele</button>
+							</div>
+							<div class="crm-todo-forms-grid" id="todo-forms-grid">
+							<div class="crm-todo-form-panel" id="todo-form-panel">
+								<h4 class="crm-todo-form-title"><span class="icon solid fa-user" aria-hidden="true"></span> Kendime görev</h4>
+								<form id="todo-form" class="crm-todo-form crm-todo-form-stack">
+									<input type="text" id="todo-baslik" placeholder="Görev metni…" autocomplete="off" />
+									<input type="date" id="todo-tarih" class="crm-date" aria-label="Son tarih" />
+									<button type="submit" class="button crm-todo-add">Ekle</button>
+								</form>
+							</div>
+							<div class="crm-todo-form-panel" id="todo-ata-panel" hidden>
+								<h4 class="crm-todo-form-title"><span class="icon solid fa-user-plus" aria-hidden="true"></span> Personele görev</h4>
+								<p class="crm-todo-composer-hint">Çalışan listesi, seçilen ürünün şirketiyle sınırlıdır.</p>
+								<form id="todo-ata-form" class="crm-todo-form crm-todo-form-stack">
+									<select id="todo-ata-urun" required aria-label="Ürün">
+										<option value="">Ürün seçin</option>
+									</select>
+									<select id="todo-ata-calisan" required aria-label="Çalışan" disabled>
+										<option value="">Önce ürün seçin</option>
+									</select>
+									<input type="text" id="todo-ata-baslik" placeholder="Görev metni…" autocomplete="off" />
+									<button type="submit" class="button crm-todo-add">Ata</button>
+								</form>
+							</div>
+							</div>
+						</div>
+					</aside>
+				</div>
+			</section>
+
+			<!-- Kullanıcı Yönetimi (Sadece Admin) -->
+			<section id="kullanici-yonetimi" class="wrapper style1" data-view-panel="kullanici-yonetimi" hidden>
+				<div class="inner">
+					<header class="crm-records-head">
+						<div>
+							<h3>Kullanıcı Yönetimi</h3>
+							<p>Sisteme yeni personel ekleyin ve mevcut kullanıcıları yönetin.</p>
+						</div>
+					</header>
+
+					<!-- Yeni Kullanıcı Formu -->
+					<div class="crm-panel" id="yeni-kullanici-panel">
+						<h4 class="crm-kullanici-form-baslik"><span class="icon solid fa-user-plus"></span> Yeni Kullanıcı Ekle</h4>
+						<form id="yeni-kullanici-form" class="crm-kullanici-form">
+							<label>
+								<span class="crm-field-label">Kullanıcı Adı</span>
+								<input type="text" id="yk-kadi" required autocomplete="username" />
+							</label>
+							<label>
+								<span class="crm-field-label">Ad Soyad</span>
+								<input type="text" id="yk-ad" autocomplete="name" />
+							</label>
+							<label>
+								<span class="crm-field-label">E-Posta Adresi</span>
+								<input type="email" id="yk-email" required placeholder="ornek@sirket.com" autocomplete="email" />
+							</label>
+							<label>
+								<span class="crm-field-label">Şirket</span>
+								<select id="yk-sirket" required>
+									<option value="">Şirket seçin...</option>
+								</select>
+							</label>
+							<label>
+								<span class="crm-field-label">Şifre</span>
+								<input type="password" id="yk-sifre" required autocomplete="new-password" />
+							</label>
+							<p id="yk-hata" class="crm-alert" hidden></p>
+							<p id="yk-basari" class="crm-kullanici-form-basari" style="display:none"></p>
+							<ul class="actions">
+								<li><button type="submit" class="button primary icon solid fa-plus">Ekle</button></li>
+							</ul>
+						</form>
+					</div>
+
+					<!-- Mevcut Kullanıcı Listesi -->
+					<div id="kullanici-liste-wrap">
+						<h4 style="margin-bottom:.8rem;color:var(--crm-accent,#6fc3df)"><span class="icon solid fa-list"></span> Mevcut Personeller</h4>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="kullanici-arama" placeholder="İsim, kullanıcı adı veya e-posta ara…" autocomplete="off" />
+							</label>
+							<select id="kullanici-filtre-rol" aria-label="Role göre filtrele">
+								<option value="">Tüm roller</option>
+								<option value="admin">Admin</option>
+								<option value="user">Kullanıcı</option>
+							</select>
+							<span id="kullanici-sonuc" class="crm-table-count"></span>
+						</div>
+						<div id="kullanici-liste-yukleniyor" style="color:rgba(255,255,255,0.5);font-size:.9rem">Yükleniyor...</div>
+						<div class="crm-tw crm-data-shell w-full">
+						<table class="crm-table crm-table-wide crm-table-premium crm-data-table" id="kullanici-tablosu" hidden>
+							<thead>
+								<tr>
+									<th><button type="button" class="crm-sort-btn" data-sort="id">ID <span class="crm-sort-icon">↕</span></button></th>
+									<th><button type="button" class="crm-sort-btn" data-sort="kadi">Kullanıcı Adı <span class="crm-sort-icon">↕</span></button></th>
+									<th><button type="button" class="crm-sort-btn" data-sort="ad">Ad Soyad <span class="crm-sort-icon">↕</span></button></th>
+									<th><button type="button" class="crm-sort-btn" data-sort="email">E-Posta <span class="crm-sort-icon">↕</span></button></th>
+									<th><button type="button" class="crm-sort-btn" data-sort="sirket" data-col-filter="sirket">Şirket <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+									<th><button type="button" class="crm-sort-btn" data-sort="rol" data-col-filter="rol">Rol <span class="crm-filter-caret" aria-hidden="true">▾</span> <span class="crm-sort-icon">↕</span></button></th>
+									<th>İşlem</th>
+								</tr>
+							</thead>
+							<tbody id="kullanici-tbody"></tbody>
+						</table>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="veritabani-view" class="wrapper style1" data-view-panel="veritabani" hidden>
+				<div class="inner crm-db-inner">
+					<section class="crm-records crm-db-panel" aria-label="Veritabanı tabloları">
+						<header class="crm-records-head">
+							<div>
+								<h3>Veritabanı</h3>
+								<p>Tüm kullanıcılar tabloları görüntüleyebilir. <span class="crm-readonly-hint">Standart kullanıcılar yalnızca görüntüleyebilir.</span></p>
+							</div>
+						</header>
+						<nav id="db-tablo-listesi" class="crm-db-tabs" aria-label="Tablolar"></nav>
+						<div class="crm-table-toolbar crm-tw w-full">
+							<label class="crm-search">
+								<span class="icon solid fa-search" aria-hidden="true"></span>
+								<input type="search" id="db-arama" placeholder="Tabloda herhangi bir kolonda ara…" autocomplete="off" />
+							</label>
+							<span id="db-sonuc" class="crm-table-count"></span>
+						</div>
+						<p id="db-tablo-ozet" class="crm-db-ozet">Tablo seçin...</p>
+						<div class="crm-table-wrap">
+							<table class="crm-table crm-table-wide crm-table-premium crm-data-table" id="veritabani-tablosu">
+								<thead id="veritabani-thead"></thead>
+								<tbody id="veritabani-tbody">
+									<tr><td>Tablo seçildiğinde kayıtlar burada görünür.</td></tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</section>
+		</div>
+
+		</div><!-- /.crm-app-main -->
+		</div>
+
+		<div id="kayit-drawer" class="crm-drawer" hidden>
+			<div class="crm-drawer-backdrop" data-close-drawer></div>
+			<aside class="crm-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drawer-kurum">
+				<header class="crm-drawer-head">
+					<div>
+						<p id="drawer-tarih" class="crm-drawer-date">—</p>
+						<h2 id="drawer-kurum">Görüşme detayı</h2>
+					</div>
+					<button type="button" id="drawer-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<div id="drawer-yukle" class="crm-loading" hidden>
+					<span class="crm-spinner" aria-hidden="true"></span>
+					<span class="crm-loading-text">Detay yükleniyor...</span>
+				</div>
+				<div id="drawer-hata" class="box crm-alert" hidden>
+					<p id="drawer-hata-metni"></p>
+				</div>
+				<div id="drawer-icerik" hidden>
+					<div class="crm-drawer-badges">
+						<span id="drawer-durum" class="crm-badge is-pending">—</span>
+						<span id="drawer-surec" class="crm-chip crm-chip-subscription is-hicbiri">—</span>
+					</div>
+					<div id="drawer-urunler" class="crm-chip-row crm-drawer-urunler"></div>
+					<section class="crm-drawer-kayit-ozet" aria-label="Sesli görüşme kaydı">
+						<h3>Sesli Görüşme / Kayıt</h3>
+						<p class="crm-drawer-kayit-hint">Bu kayıt mikrofonla dikte edilen veya yazılan görüşme metninden oluşturuldu.</p>
+					</section>
+					<section class="crm-drawer-transcript">
+						<span>Görüşme notu</span>
+						<p id="drawer-not">—</p>
+					</section>
+					<section id="kayit-gorevler-wrap" class="crm-kayit-gorevler crm-drawer-gorevler" aria-label="Bu görüşmeden çıkan AI görevleri">
+						<h3>AI To-Do Notları</h3>
+						<p class="crm-kayit-gorevler-hint">Yapay zekanın bu görüşmeden çıkardığı görevler. Varsayılan olarak görüşmeyi yapan kişidedir; admin Görev Ata ile aynı şirket personeline verebilir.</p>
+						<ul id="kayit-gorevler-list" class="crm-gorev-list"></ul>
+						<p id="kayit-gorevler-bos" class="crm-gorev-bos">Bu görüşme için AI tarafından çıkarılan bir görev bulunmuyor.</p>
+					</section>
+					<ul class="actions crm-admin-only" id="drawer-admin-actions">
+						<li><button type="button" id="drawer-duzenle" class="button">Düzenle</button></li>
+					</ul>
+				</div>
+			</aside>
+		</div>
+
+		<div id="stats-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
+				<header>
+					<button type="button" id="stats-modal-geri" class="crm-modal-back" hidden>Geri</button>
+					<h2 id="stats-modal-title">Detay</h2>
+					<button type="button" id="stats-modal-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<div id="stats-modal-liste-wrap">
+					<ul id="stats-modal-liste" class="alt crm-pick-list"></ul>
+				</div>
+				<div id="stats-modal-detay" class="crm-deepdive" hidden>
+					<div id="detay-yukleniyor" class="crm-loading" hidden>
+						<span class="crm-spinner" aria-hidden="true"></span>
+						<span class="crm-loading-text">Detay yükleniyor...</span>
+					</div>
+					<div id="detay-hata" class="box crm-alert" hidden>
+						<p id="detay-hata-metni"></p>
+					</div>
+					<div id="detay-icerik" hidden>
+						<div class="crm-deep-grid">
+							<div class="crm-deep-field">
+								<span>Son Görüşme Tarihi</span>
+								<strong id="detay-tarih">—</strong>
+							</div>
+							<div class="crm-deep-field">
+								<span>Görüşme Durumu</span>
+								<strong id="detay-durum">—</strong>
+							</div>
+							<div class="crm-deep-field">
+								<span>Süreç Tipi</span>
+								<strong id="detay-surec">—</strong>
+							</div>
+							<div class="crm-deep-field crm-deep-wide">
+								<span>İlgilenilen Ürünler</span>
+								<strong id="detay-urunler">—</strong>
+							</div>
+						</div>
+						<div class="crm-deep-note crm-detay-gorevler" id="detay-gorevler-wrap">
+							<span>AI To-Do Notları</span>
+							<ul id="detay-gorevler-list" class="crm-gorev-list"></ul>
+							<p id="detay-gorevler-bos" class="crm-gorev-bos">Bu görüşme için AI tarafından çıkarılan bir görev bulunmuyor.</p>
+						</div>
+						<div class="crm-deep-note">
+							<span>Geçmiş Görüşme Notu</span>
+							<p id="detay-not">—</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="kayit-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-kayit-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="kayit-modal-title">
+				<header>
+					<h2 id="kayit-modal-title">Yeni Kayıt</h2>
+					<button type="button" id="kayit-modal-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="kayit-formu" class="crm-kayit-form">
+					<input type="hidden" id="kayit-id" value="" />
+					<label>
+						Kurum Adı
+						<input type="text" id="kayit-kurum" required placeholder="Örn: Gazi Üniversitesi" />
+					</label>
+					<label>
+						Ürünler
+						<select id="kayit-urun" aria-label="Ürünler">
+							<option value="">Ürün seçin</option>
+						</select>
+					</label>
+					<label>
+						Süreç Tipi
+						<select id="kayit-abonelik-tipi">
+							<option value="Hiçbiri">Hiçbiri</option>
+							<option value="Deneme">Deneme</option>
+							<option value="Abonelik">Abonelik</option>
+						</select>
+					</label>
+					<label>
+						Durum
+						<select id="kayit-durum">
+							<option value="Beklemede">Beklemede</option>
+							<option value="Olumlu">Olumlu</option>
+							<option value="Olumsuz">Olumsuz</option>
+							<option value="Karma">Karma</option>
+						</select>
+					</label>
+					<label>
+						Notlar
+						<textarea id="kayit-not" rows="4" placeholder="Görüşme notu..."></textarea>
+					</label>
+					<p id="kayit-form-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" id="kayit-kaydet" class="button primary">Kaydet</button></li>
+						<li><button type="button" id="kayit-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+
+		<div id="db-edit-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-db-edit></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="db-edit-title">
+				<header>
+					<h2 id="db-edit-title">Kaydı Düzenle</h2>
+					<button type="button" id="db-edit-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="db-edit-form" class="crm-kayit-form">
+					<div id="db-edit-fields"></div>
+					<p id="db-edit-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" class="button primary">Kaydet</button></li>
+						<li><button type="button" id="db-edit-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+
+		<div id="profil-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-profil-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="profil-modal-title">
+				<header>
+					<h2 id="profil-modal-title">Adımı Düzenle</h2>
+					<button type="button" id="profil-modal-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="profil-form" class="crm-kayit-form">
+					<p class="crm-sifre-hint">Kullanıcı adınız yönetici tarafından belirlenir; yalnızca görünen adınızı güncelleyebilirsiniz.</p>
+					<label>
+						Kullanıcı adı
+						<input type="text" id="profil-kullanici-adi" readonly tabindex="-1" aria-readonly="true" />
+					</label>
+					<label>
+						Ad Soyad
+						<input type="text" id="profil-ad-soyad" required autocomplete="name" maxlength="255" />
+					</label>
+					<p id="profil-form-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" class="button primary icon solid fa-save">Kaydet</button></li>
+						<li><button type="button" id="profil-form-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+
+		<div id="sifre-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-sifre-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="sifre-modal-title">
+				<header>
+					<h2 id="sifre-modal-title">Şifre Değiştir</h2>
+					<button type="button" id="sifre-modal-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="sifre-degistir-form" class="crm-kayit-form">
+					<p class="crm-sifre-hint">Kullanıcı adınız değişmez; yalnızca şifrenizi güncelleyebilirsiniz.</p>
+					<label>
+						Kullanıcı adı
+						<input type="text" id="sifre-kullanici-adi" readonly tabindex="-1" aria-readonly="true" />
+					</label>
+					<label>
+						Mevcut şifre
+						<input type="password" id="sifre-mevcut" required autocomplete="current-password" />
+					</label>
+					<label>
+						Yeni şifre
+						<input type="password" id="sifre-yeni" required autocomplete="new-password" minlength="4" />
+					</label>
+					<label>
+						Yeni şifre (tekrar)
+						<input type="password" id="sifre-yeni-tekrar" required autocomplete="new-password" minlength="4" />
+					</label>
+					<p id="sifre-form-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" class="button primary icon solid fa-key">Şifreyi Güncelle</button></li>
+						<li><button type="button" id="sifre-form-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+
+		<div id="kurum-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-kurum-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="kurum-modal-title">
+				<header>
+					<h2 id="kurum-modal-title">Kurum</h2>
+					<button type="button" id="kurum-modal-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="kurum-form" class="crm-kayit-form">
+					<p id="kurum-modal-aciklama" class="crm-sifre-hint" hidden></p>
+					<label id="kurum-ad-wrap">
+						Kurum adı
+						<input type="text" id="kurum-ad-input" required autocomplete="organization" />
+					</label>
+					<p id="kurum-form-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" id="kurum-form-kaydet" class="button primary">Kaydet</button></li>
+						<li><button type="button" id="kurum-form-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+				<div id="kurum-sil-panel" class="crm-kayit-form" hidden>
+					<p id="kurum-sil-metin"></p>
+					<p id="kurum-sil-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="button" id="kurum-sil-evet" class="button primary">Sil</button></li>
+						<li><button type="button" id="kurum-sil-hayir" class="button">İptal</button></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div id="crm-toast-stack" class="crm-toast-stack" aria-live="polite" aria-relevant="additions"></div>
+
+		<div id="bildirim-panel" class="bildirim-panel" hidden>
+			<div class="bildirim-panel-head">
+				<strong>Bildirimler</strong>
+				<button type="button" id="bildirim-hepsini-oku" class="bildirim-hepsini-oku">Tümünü okundu işaretle</button>
+			</div>
+			<ul id="bildirim-liste" class="bildirim-liste"></ul>
+		</div>
+
+		<!-- Her yerden erişilebilir Yeni Görev FAB -->
+		<button type="button" id="fab-yeni-gorev" class="crm-fab" title="Yeni Görev Ekle" aria-label="Yeni Görev Ekle">
+			<span class="icon solid fa-plus" aria-hidden="true"></span>
+			<span class="crm-fab-label">Yeni Görev</span>
+		</button>
+
+		<div id="fab-gorev-modal" class="crm-modal" hidden>
+			<div class="crm-modal-backdrop" data-close-fab-gorev></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" aria-labelledby="fab-gorev-title">
+				<header>
+					<h2 id="fab-gorev-title">Yeni Görev Ekle</h2>
+					<button type="button" id="fab-gorev-kapat" class="crm-modal-close" aria-label="Kapat">&times;</button>
+				</header>
+				<form id="fab-gorev-form" class="crm-kayit-form">
+					<div id="fab-gorev-tabs" class="crm-todo-composer-tabs" hidden role="group" aria-label="Görev ekleme türü">
+						<button type="button" class="crm-todo-kapsam-btn is-active" data-fab-composer="kendime">Kendime</button>
+						<button type="button" class="crm-todo-kapsam-btn" data-fab-composer="personele">Personele</button>
+					</div>
+					<div id="fab-gorev-personele-alan" hidden>
+						<p class="crm-todo-composer-hint">Önce ürün, sonra o ürünün şirketindeki çalışan.</p>
+						<label>
+							Ürün
+							<select id="fab-gorev-urun" aria-label="Ürün">
+								<option value="">Ürün seçin</option>
+							</select>
+						</label>
+						<label>
+							Çalışan
+							<select id="fab-gorev-calisan" aria-label="Çalışan" disabled>
+								<option value="">Önce ürün seçin</option>
+							</select>
+						</label>
+					</div>
+					<label>
+						<span id="fab-gorev-baslik-etiket">Görev (size atanır)</span>
+						<input type="text" id="fab-gorev-baslik" required placeholder="Örn: Teklif gönder, takip ara..." autocomplete="off" />
+					</label>
+					<label>
+						Son tarih (opsiyonel)
+						<input type="date" id="fab-gorev-tarih" class="crm-date" />
+					</label>
+					<p id="fab-gorev-hata" class="crm-alert" hidden></p>
+					<ul class="actions">
+						<li><button type="submit" id="fab-gorev-kaydet" class="button primary icon solid fa-plus">Ekle</button></li>
+						<li><button type="button" id="fab-gorev-iptal" class="button">İptal</button></li>
+					</ul>
+				</form>
+			</div>
+		</div>
+
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/os-notify.js?v=20260828s"></script>
+		<script src="assets/js/web-fcm.js?v=20260828s"></script>
+		<script src="assets/js/main.js?v=20260831d"></script>
+
+		<div id="crm-col-filter-popover" class="crm-col-filter-popover" hidden role="dialog" aria-modal="false">
+			<p class="crm-col-filter-title"></p>
+			<div class="crm-col-filter-list"></div>
+		</div>
+
+	</body>
+</html>

@@ -1,0 +1,165 @@
+
+/* Yıldızlı gece gökyüzü teması */
+
+	body.crm-ops {
+		background: #050816;
+		position: relative;
+		overflow-x: hidden;
+	}
+
+	.starfield {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		overflow: hidden;
+		pointer-events: none !important;
+		background:
+			radial-gradient(ellipse 120% 80% at 20% 10%, rgba(88, 70, 180, 0.28), transparent 50%),
+			radial-gradient(ellipse 90% 70% at 85% 80%, rgba(40, 70, 160, 0.22), transparent 55%),
+			radial-gradient(ellipse 60% 40% at 50% 100%, rgba(20, 10, 50, 0.55), transparent 60%),
+			linear-gradient(180deg, #050816 0%, #0b1230 45%, #070b1c 100%);
+	}
+
+	.starfield .stars,
+	.starfield .stars-mid,
+	.starfield .stars-far {
+		pointer-events: none !important;
+	}
+
+	.starfield .stars,
+	.starfield .stars-mid,
+	.starfield .stars-far {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background: transparent;
+		border-radius: 50%;
+	}
+
+	.starfield .stars {
+		width: 1px;
+		height: 1px;
+		box-shadow: 1309px 228px #FFF, 51px 1518px #FFF, 563px 501px #FFF, 457px 285px #FFF, 1508px 209px #FFF, 1385px 1516px #FFF, 1116px 178px #FFF, 1209px 864px #FFF, 65px 61px #FFF, 191px 447px #FFF, 476px 1034px #FFF, 1232px 54px #FFF, 1149px 407px #FFF, 1466px 1330px #FFF, 1436px 1116px #FFF, 859px 451px #FFF, 919px 1206px #FFF, 569px 1657px #FFF, 1780px 13px #FFF, 1554px 1650px #FFF, 326px 1429px #FFF, 865px 696px #FFF, 569px 318px #FFF, 440px 1563px #FFF, 689px 209px #FFF, 189px 778px #FFF, 198px 735px #FFF, 1735px 704px #FFF, 1236px 541px #FFF, 1652px 88px #FFF, 1494px 940px #FFF, 1098px 255px #FFF, 775px 161px #FFF, 1130px 600px #FFF, 1698px 1287px #FFF, 1266px 1764px #FFF, 740px 1182px #FFF, 393px 1442px #FFF, 142px 93px #FFF, 1354px 466px #FFF, 1583px 592px #FFF, 163px 1751px #FFF, 476px 1774px #FFF, 206px 778px #FFF, 569px 928px #FFF, 1301px 1708px #FFF, 747px 333px #FFF, 758px 727px #FFF, 429px 1372px #FFF, 546px 1437px #FFF, 1399px 1327px #FFF, 146px 1247px #FFF, 1300px 350px #FFF, 1093px 1493px #FFF, 501px 334px #FFF, 946px 777px #FFF, 552px 1310px #FFF, 1409px 1140px #FFF, 449px 1402px #FFF, 664px 1726px #FFF, 1573px 1589px #FFF, 114px 469px #FFF, 1683px 65px #FFF, 1648px 646px #FFF, 821px 548px #FFF, 135px 432px #FFF, 1161px 1794px #FFF, 1470px 644px #FFF, 435px 1342px #FFF, 1022px 810px #FFF, 1316px 939px #FFF, 292px 542px #FFF, 285px 505px #FFF, 1525px 1149px #FFF, 1103px 538px #FFF, 1529px 1197px #FFF, 877px 1195px #FFF, 817px 741px #FFF, 449px 283px #FFF, 1043px 1010px #FFF, 186px 1547px #FFF, 96px 1763px #FFF, 224px 313px #FFF, 1285px 327px #FFF, 1622px 1393px #FFF, 864px 1221px #FFF, 130px 788px #FFF, 781px 1220px #FFF, 958px 1083px #FFF, 514px 1133px #FFF, 1762px 23px #FFF, 1393px 1476px #FFF, 234px 1396px #FFF, 1099px 1537px #FFF, 546px 1574px #FFF, 1312px 696px #FFF, 228px 601px #FFF, 890px 323px #FFF, 929px 6px #FFF, 1478px 1793px #FFF, 1473px 539px #FFF, 1025px 1560px #FFF, 365px 1039px #FFF, 217px 1782px #FFF, 1280px 611px #FFF, 1723px 1308px #FFF, 1039px 1247px #FFF, 407px 313px #FFF, 765px 1561px #FFF, 330px 1104px #FFF, 1594px 1086px #FFF, 1px 1226px #FFF, 663px 1000px #FFF, 39px 229px #FFF, 743px 1799px #FFF, 1703px 1652px #FFF, 629px 490px #FFF, 118px 493px #FFF, 1798px 1161px #FFF, 161px 175px #FFF, 1498px 995px #FFF, 1671px 141px #FFF, 1557px 1090px #FFF, 1568px 257px #FFF, 262px 1351px #FFF, 973px 1125px #FFF, 338px 542px #FFF, 1080px 1786px #FFF, 1242px 866px #FFF, 433px 1104px #FFF, 1546px 1494px #FFF, 1412px 411px #FFF, 1460px 638px #FFF, 817px 1375px #FFF, 1330px 764px #FFF, 897px 1059px #FFF, 924px 247px #FFF, 507px 460px #FFF, 131px 692px #FFF, 43px 1204px #FFF, 1134px 471px #FFF, 1205px 451px #FFF, 14px 145px #FFF, 1449px 1292px #FFF, 120px 468px #FFF, 138px 64px #FFF, 1760px 676px #FFF, 145px 1052px #FFF, 487px 570px #FFF, 1370px 994px #FFF, 438px 1104px #FFF, 270px 1481px #FFF, 1169px 1180px #FFF, 968px 497px #FFF, 1606px 968px #FFF, 1653px 833px #FFF, 389px 193px #FFF, 198px 1349px #FFF, 882px 725px #FFF, 867px 841px #FFF;
+		animation: crm-twinkle 3.2s ease-in-out infinite;
+	}
+
+	.starfield .stars-mid {
+		width: 2px;
+		height: 2px;
+		box-shadow: 956px 1769px #FFF, 1493px 110px #FFF, 1379px 1338px #FFF, 1323px 201px #FFF, 124px 824px #FFF, 1491px 694px #FFF, 1639px 1764px #FFF, 223px 509px #FFF, 392px 389px #FFF, 1098px 918px #FFF, 287px 864px #FFF, 375px 570px #FFF, 947px 511px #FFF, 1790px 154px #FFF, 907px 1654px #FFF, 1764px 1753px #FFF, 1127px 200px #FFF, 103px 1335px #FFF, 1107px 1712px #FFF, 30px 191px #FFF, 1543px 1738px #FFF, 484px 340px #FFF, 832px 994px #FFF, 985px 437px #FFF, 1770px 821px #FFF, 120px 337px #FFF, 776px 4px #FFF, 799px 543px #FFF, 1605px 1607px #FFF, 931px 584px #FFF, 866px 1426px #FFF, 1496px 1604px #FFF, 1138px 1355px #FFF, 1471px 996px #FFF, 317px 388px #FFF, 607px 445px #FFF, 119px 1186px #FFF, 1506px 1110px #FFF, 124px 1531px #FFF, 642px 117px #FFF, 102px 1196px #FFF, 976px 1029px #FFF, 1746px 1087px #FFF, 322px 116px #FFF, 1040px 164px #FFF, 1743px 380px #FFF, 140px 1218px #FFF, 139px 1382px #FFF, 1765px 481px #FFF, 826px 245px #FFF, 1166px 504px #FFF, 1185px 1217px #FFF, 81px 1268px #FFF, 167px 858px #FFF, 1346px 1195px #FFF, 1157px 1070px #FFF, 647px 534px #FFF, 418px 1371px #FFF, 1466px 643px #FFF, 488px 543px #FFF, 810px 268px #FFF, 1375px 1321px #FFF, 614px 936px #FFF, 647px 1539px #FFF, 148px 19px #FFF, 938px 1272px #FFF, 1153px 204px #FFF, 150px 1101px #FFF, 436px 1036px #FFF, 543px 271px #FFF;
+		animation: crm-twinkle 5s ease-in-out infinite;
+		opacity: 0.85;
+	}
+
+	.starfield .stars-far {
+		width: 3px;
+		height: 3px;
+		box-shadow: 714px 140px #FFF, 1800px 500px #FFF, 756px 583px #FFF, 323px 897px #FFF, 1707px 1112px #FFF, 1440px 619px #FFF, 1252px 1652px #FFF, 1339px 1083px #FFF, 16px 1367px #FFF, 1673px 1135px #FFF, 613px 1358px #FFF, 212px 1798px #FFF, 275px 541px #FFF, 236px 219px #FFF, 1520px 1133px #FFF, 318px 557px #FFF, 577px 1238px #FFF, 431px 1469px #FFF, 702px 416px #FFF, 1407px 1298px #FFF, 1746px 540px #FFF, 1035px 1000px #FFF, 514px 1732px #FFF, 104px 189px #FFF, 1299px 867px #FFF, 1698px 566px #FFF, 90px 7px #FFF, 683px 1579px #FFF, 267px 1304px #FFF, 536px 330px #FFF, 1518px 904px #FFF, 1129px 1445px #FFF, 875px 1148px #FFF, 19px 229px #FFF, 154px 1415px #FFF;
+		animation: crm-twinkle 7s ease-in-out infinite;
+		opacity: 0.7;
+	}
+
+	@keyframes crm-twinkle {
+		0%, 100% { opacity: 0.55; }
+		50% { opacity: 1; }
+	}
+
+	body.crm-ops #header,
+	body.crm-ops #wrapper,
+	body.crm-ops #footer {
+		position: relative;
+		z-index: 2;
+		pointer-events: auto;
+	}
+
+	body.crm-ops #stats-modal {
+		position: fixed;
+		z-index: 10050;
+	}
+
+	body.crm-ops #header {
+		background: rgba(8, 12, 32, 0.72);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-bottom: solid 1px rgba(180, 200, 255, 0.12);
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+	}
+
+	body.crm-ops #wrapper > .wrapper.style1 {
+		background: transparent;
+	}
+
+	body.crm-ops #footer.wrapper.style1-alt {
+		background: rgba(5, 8, 22, 0.55);
+		border-top: solid 1px rgba(180, 200, 255, 0.1);
+	}
+
+	body.crm-ops .crm-stat,
+	body.crm-ops .crm-panel,
+	body.crm-ops .crm-todo,
+	body.crm-ops .crm-card {
+		background: rgba(10, 16, 40, 0.55);
+		border-color: rgba(180, 200, 255, 0.18);
+		box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+
+	body.crm-ops .crm-stat:nth-child(1) .icon {
+		background: rgba(120, 160, 255, 0.28);
+	}
+
+	body.crm-ops .crm-stat:nth-child(2) .icon {
+		background: rgba(90, 140, 255, 0.28);
+	}
+
+	body.crm-ops .crm-stat:nth-child(3) .icon {
+		background: rgba(200, 170, 255, 0.28);
+	}
+
+	body.crm-ops .crm-todo-item.is-ai {
+		border-left-color: #9db4ff;
+	}
+
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-0 { border-left-color: #7dd3fc; }
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-1 { border-left-color: #c4b5fd; }
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-2 { border-left-color: #86efac; }
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-3 { border-left-color: #fcd34d; }
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-4 { border-left-color: #5eead4; }
+	body.crm-ops .crm-todo-item.is-ai.is-atanan-5 { border-left-color: #f9a8d4; }
+
+	body.crm-ops .crm-todo-badge {
+		background: rgba(120, 150, 255, 0.28);
+		border-color: rgba(160, 190, 255, 0.5);
+	}
+
+	body.crm-ops #kart-durum.is-positive {
+		border-color: #6ee7b7;
+		box-shadow: inset 3px 0 0 #6ee7b7;
+	}
+
+	body.crm-ops #kart-durum.is-negative {
+		border-color: #f472b6;
+		box-shadow: inset 3px 0 0 #f472b6;
+	}
+
+	body.crm-ops #kart-durum.is-pending {
+		border-color: #fde68a;
+		box-shadow: inset 3px 0 0 #fde68a;
+	}
+
+	body.crm-ops .crm-modal-dialog {
+		background: rgba(12, 18, 42, 0.94);
+		border-color: rgba(180, 200, 255, 0.2);
+	}
+
+	body.crm-ops.is-preload .starfield .stars,
+	body.crm-ops.is-preload .starfield .stars-mid,
+	body.crm-ops.is-preload .starfield .stars-far {
+		-moz-animation: crm-twinkle 3.2s ease-in-out infinite !important;
+		-webkit-animation: crm-twinkle 3.2s ease-in-out infinite !important;
+		animation: crm-twinkle 3.2s ease-in-out infinite !important;
+		-moz-transition: none !important;
+		-webkit-transition: none !important;
+		transition: none !important;
+	}

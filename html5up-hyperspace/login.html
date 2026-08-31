@@ -1,0 +1,421 @@
+<!DOCTYPE HTML>
+<html lang="tr">
+<head>
+	<title>Giriş — CRM Analiz Portalı</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css?v=202608272" />
+	<link rel="stylesheet" href="assets/css/stars.css" />
+	<style>
+		/* ── Login Overlay ──────────────────────────────────────────────── */
+		body { margin: 0; overflow: hidden; }
+
+		.login-wrap {
+			position: fixed;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 100;
+		}
+
+		.login-card {
+			background: rgba(27, 31, 48, 0.92);
+			border: 1px solid rgba(255,255,255,0.08);
+			border-radius: 12px;
+			padding: 2.8rem 3rem;
+			width: 100%;
+			max-width: 400px;
+			box-shadow: 0 8px 48px rgba(0,0,0,0.55);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+		}
+
+		.login-brand {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+
+		.login-brand .icon {
+			font-size: 2.2rem;
+			color: #6fc3df;
+			display: block;
+			margin-bottom: .5rem;
+		}
+
+		.login-brand h1 {
+			font-size: 1.4rem;
+			font-weight: 700;
+			color: #fff;
+			margin: 0;
+			letter-spacing: .03em;
+		}
+
+		.login-brand p {
+			font-size: .82rem;
+			color: rgba(255,255,255,0.45);
+			margin: .3rem 0 0;
+		}
+
+		.login-field {
+			margin-bottom: 1.1rem;
+		}
+
+		.login-field label {
+			display: block;
+			font-size: .78rem;
+			text-transform: uppercase;
+			letter-spacing: .1em;
+			color: rgba(255,255,255,0.5);
+			margin-bottom: .4rem;
+		}
+
+		.login-field input {
+			width: 100%;
+			box-sizing: border-box;
+			background: rgba(255,255,255,0.06);
+			border: 1px solid rgba(255,255,255,0.12);
+			border-radius: 6px;
+			padding: .75rem 1rem;
+			font-size: .95rem;
+			color: #fff;
+			outline: none;
+			transition: border-color .2s;
+		}
+
+		.login-field input:focus {
+			border-color: #6fc3df;
+			background: rgba(111,195,223,0.06);
+		}
+
+		.login-field input::placeholder { color: rgba(255,255,255,0.22); }
+
+		.login-btn {
+			width: 100%;
+			box-sizing: border-box;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.4rem;
+			min-height: auto;
+			height: auto;
+			line-height: 1.35;
+			padding: 0.8rem 1rem;
+			border: none !important;
+			border-radius: 6px;
+			background: #6fc3df !important;
+			color: #0d1117 !important;
+			font-size: 1rem !important;
+			font-weight: 700;
+			cursor: pointer;
+			transition: background 0.2s, opacity 0.2s;
+			margin-top: 0.5rem;
+			letter-spacing: 0.03em;
+			text-align: center;
+			text-transform: none;
+			white-space: nowrap;
+			position: relative;
+		}
+
+		.login-btn:after {
+			display: none !important;
+			content: none !important;
+		}
+
+		.login-btn:hover:not(:disabled) { background: #8fd4ec !important; }
+		.login-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+		.login-switch {
+			text-align: center;
+			margin-top: 1.25rem;
+			font-size: .85rem;
+			color: rgba(255,255,255,0.45);
+		}
+		.login-switch a {
+			color: #6fc3df;
+			cursor: pointer;
+			text-decoration: none;
+			font-weight: 600;
+		}
+		.login-switch a:hover { text-decoration: underline; }
+
+		#login-hata {
+			display: none;
+			background: rgba(220,60,60,.15);
+			border: 1px solid rgba(220,60,60,.35);
+			border-radius: 6px;
+			padding: .65rem .9rem;
+			font-size: .87rem;
+			color: #f08080;
+			margin-top: 1rem;
+			text-align: center;
+		}
+
+		.login-spinner {
+			display: inline-block;
+			flex-shrink: 0;
+			width: 16px;
+			height: 16px;
+			border: 2px solid rgba(13, 17, 23, 0.4);
+			border-top-color: #0d1117;
+			border-radius: 50%;
+			animation: spin 0.7s linear infinite;
+			vertical-align: middle;
+			margin: 0;
+		}
+
+		@keyframes spin { to { transform: rotate(360deg); } }
+	</style>
+</head>
+<body class="is-preload">
+
+	<!-- Yıldızlı arka plan (ana sayfayla aynı) -->
+	<div class="starfield" aria-hidden="true">
+		<div class="stars"></div>
+		<div class="stars-mid"></div>
+		<div class="stars-far"></div>
+	</div>
+
+	<!-- Login Kartı -->
+	<div class="login-wrap">
+		<div class="login-card">
+			<div class="login-brand">
+				<span class="icon solid fa-satellite-dish" aria-hidden="true"></span>
+				<h1>CRM Analiz Portalı</h1>
+				<p id="login-alt">Devam etmek için giriş yapın</p>
+			</div>
+
+			<form id="login-form" novalidate>
+				<div class="login-field" id="alan-adsoyad" hidden>
+					<label for="login-adsoyad">Ad Soyad</label>
+					<input
+						type="text"
+						id="login-adsoyad"
+						name="ad_soyad"
+						placeholder="Ad Soyad (isteğe bağlı)"
+						autocomplete="name"
+					/>
+				</div>
+				<div class="login-field">
+					<label for="login-kadi">Kullanıcı Adı</label>
+					<input
+						type="text"
+						id="login-kadi"
+						name="kullanici_adi"
+						placeholder="kullanici_adi"
+						autocomplete="username"
+						required
+					/>
+				</div>
+				<div class="login-field">
+					<label for="login-sifre">Şifre</label>
+					<input
+						type="password"
+						id="login-sifre"
+						name="sifre"
+						placeholder="••••••••"
+						autocomplete="current-password"
+						required
+					/>
+				</div>
+
+				<button type="submit" id="login-btn" class="login-btn">
+					Giriş Yap
+				</button>
+
+				<div id="login-hata" role="alert"></div>
+			</form>
+			<p class="login-switch" id="login-switch">
+				<span id="login-switch-on">Hesabınız yok mu? </span>
+				<span id="login-switch-off" hidden>Zaten hesabınız var mı? </span>
+				<a href="#" id="login-mod-link">Kayıt olun</a>
+			</p>
+		</div>
+	</div>
+
+	<!-- Eğer zaten giriş yapılmışsa ana sayfaya yönlendir -->
+	<script>
+		(function () {
+			try {
+				if (localStorage.getItem('crm-auth-token'))
+					window.location.replace('index.html');
+			} catch (e) {}
+		})();
+	</script>
+
+	<link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/config.js?v=20260828a"></script>
+	<script src="assets/js/os-notify.js?v=20260828s"></script>
+	<script src="assets/js/web-fcm.js?v=20260828s"></script>
+	<script>
+		/* Starfield animasyonu için minimal başlatma */
+		window.setTimeout(function () { document.body.classList.remove('is-preload'); }, 100);
+	</script>
+
+	<script>
+		(function () {
+			'use strict';
+
+			var API_BASE = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
+			var form     = document.getElementById('login-form');
+			var btn      = document.getElementById('login-btn');
+			var hataEl   = document.getElementById('login-hata');
+			var kadiEl   = document.getElementById('login-kadi');
+			var sifreEl  = document.getElementById('login-sifre');
+			var adEl     = document.getElementById('login-adsoyad');
+			var adWrap   = document.getElementById('alan-adsoyad');
+			var altEl    = document.getElementById('login-alt');
+			var modLink  = document.getElementById('login-mod-link');
+			var switchOn = document.getElementById('login-switch-on');
+			var switchOff = document.getElementById('login-switch-off');
+			var switchWrap = document.getElementById('login-switch');
+			var kayitModu = false;
+			var kayitAcik = false;
+
+			function kayitUiGuncelle() {
+				if (switchWrap) switchWrap.hidden = !kayitAcik;
+				if (!kayitAcik && kayitModu) modAyarla(false);
+			}
+
+			function baglantiHatasiMi(err) {
+				var msg = err && err.message ? String(err.message) : '';
+				return /failed to fetch|networkerror|load failed|network request failed/i.test(msg);
+			}
+
+			function apiIstek(yol, opts) {
+				return fetch(API_BASE + yol, opts).catch(function (err) {
+					if (!baglantiHatasiMi(err)) throw err;
+					var fallback = 'http://127.0.0.1:8000';
+					if (API_BASE.replace(/\/$/, '') === fallback) throw err;
+					return fetch(fallback + yol, opts).then(function (r) {
+						API_BASE = fallback;
+						window.CRM_API_BASE = fallback;
+						try { localStorage.setItem('crm-api-base', fallback); } catch (e) {}
+						return r;
+					});
+				});
+			}
+
+			apiIstek('/api/auth/ayarlar', { headers: { Accept: 'application/json' } })
+				.then(function (r) { return r.json(); })
+				.then(function (data) {
+					kayitAcik = !!(data && data.allow_public_register);
+					kayitUiGuncelle();
+				})
+				.catch(function () {
+					kayitAcik = false;
+					kayitUiGuncelle();
+				});
+
+			function hataGoster(msg) {
+				hataEl.textContent = msg;
+				hataEl.style.display = 'block';
+			}
+			function hataGizle() { hataEl.style.display = 'none'; }
+
+			function modAyarla(kayit) {
+				kayitModu = !!kayit;
+				if (adWrap) adWrap.hidden = !kayitModu;
+				if (altEl) altEl.textContent = kayitModu
+					? 'Yeni hesap oluşturun'
+					: 'Devam etmek için giriş yapın';
+				if (btn) btn.textContent = kayitModu ? 'Kayıt Ol' : 'Giriş Yap';
+				if (modLink) modLink.textContent = kayitModu ? 'Giriş yapın' : 'Kayıt olun';
+				if (switchOn) switchOn.hidden = kayitModu;
+				if (switchOff) switchOff.hidden = !kayitModu;
+				hataGizle();
+			}
+
+			if (modLink) {
+				modLink.addEventListener('click', function (e) {
+					e.preventDefault();
+					modAyarla(!kayitModu);
+				});
+			}
+
+			function yükleniyor(aktif) {
+				btn.disabled = aktif;
+				if (aktif) {
+					btn.innerHTML = '<span class="login-spinner"></span>' +
+						(kayitModu ? 'Kayıt yapılıyor...' : 'Giriş yapılıyor...');
+				} else {
+					btn.textContent = kayitModu ? 'Kayıt Ol' : 'Giriş Yap';
+				}
+			}
+
+			function oturumKaydet(data) {
+				localStorage.setItem('crm-auth-token', data.access_token);
+				localStorage.setItem('crm-auth-user', JSON.stringify({
+					kullanici_adi: data.kullanici_adi,
+					ad_soyad: data.ad_soyad || data.kullanici_adi,
+					role: data.role || 'user',
+					id: data.id || null,
+					company_id: data.company_id != null ? data.company_id : null,
+				}));
+			}
+
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				hataGizle();
+				var kadi  = (kadiEl.value || '').trim();
+				var sifre = (sifreEl.value || '');
+				var ad    = adEl ? (adEl.value || '').trim() : '';
+				if (!kadi || !sifre) { hataGoster('Kullanıcı adı ve şifre gereklidir.'); return; }
+				if (kayitModu && sifre.length < 4) {
+					hataGoster('Şifre en az 4 karakter olmalıdır.');
+					return;
+				}
+
+				yükleniyor(true);
+				var yol = kayitModu ? '/register' : '/login';
+				var govde = { kullanici_adi: kadi, sifre: sifre };
+				if (kayitModu) govde.ad_soyad = ad || null;
+				apiIstek(yol, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+					body: JSON.stringify(govde),
+				})
+				.then(function (r) {
+					return r.json().then(function (data) {
+						if (!r.ok) {
+							var d = data.detail;
+							throw new Error(typeof d === 'string' ? d : (kayitModu ? 'Kayıt başarısız' : 'Giriş başarısız'));
+						}
+						return data;
+					});
+				})
+				.then(function (data) {
+					try { oturumKaydet(data); } catch (ex) {}
+					var gitti = false;
+					function git() {
+						if (gitti) return;
+						gitti = true;
+						window.location.replace('index.html');
+					}
+					var p = Promise.resolve();
+					if (window.CrmWebFcm && typeof CrmWebFcm.baslat === 'function')
+						p = CrmWebFcm.baslat();
+					p.catch(function () {}).then(function () {
+						if (window.CrmOsNotify && typeof CrmOsNotify.izinIste === 'function')
+							return CrmOsNotify.izinIste();
+					}).then(git, git);
+					window.setTimeout(git, 5000);
+				})
+				.catch(function (err) {
+					yükleniyor(false);
+					if (baglantiHatasiMi(err)) {
+						hataGoster('Sunucuya bağlanılamadı. Backend açık mı? uvicorn main:app --reload --host 0.0.0.0 --port 8000');
+					} else {
+						hataGoster((err && err.message) || 'Sunucuya bağlanılamadı.');
+					}
+				});
+			});
+
+			sifreEl.addEventListener('keydown', function (e) {
+				if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
+			});
+		})();
+	</script>
+</body>
+</html>

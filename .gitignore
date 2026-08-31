@@ -1,0 +1,46 @@
+# Gizli ayarlar — asla GitHub'a gitmesin
+.env
+.env.local
+.env.*.local
+firebase-service-account.json
+serviceAccountKey.json
+google-services.json
+GoogleService-Info.plist
+*.jks
+*.keystore
+key.properties
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Flutter / Android
+mobile/build/
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/.idea/
+*.iml
+*.apk
+*.aab
+
+# Editör / sistem
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Büyük eğitim dosyaları, döküm, kişisel
+adapters/
+*.safetensors
+html5up-hyperspace.zip
+staj.sql
+veri/
+temp_*

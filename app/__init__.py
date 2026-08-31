@@ -1,0 +1,1 @@
+# CRM backend uygulama paketi

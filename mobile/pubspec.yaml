@@ -1,0 +1,28 @@
+name: ainote_mobile
+description: CRM Analiz Portalı mobil uygulaması. FastAPI backend ile canlı konuşma tanıma (speech_to_text), görüşme ve görev takibi.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  speech_to_text: ^7.4.0
+  permission_handler: ^11.4.0
+  intl: ^0.20.2
+  shared_preferences: ^2.3.3
+  flutter_local_notifications: ^18.0.1
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
