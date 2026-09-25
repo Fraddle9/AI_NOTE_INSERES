@@ -53,7 +53,7 @@ E-posta (SMTP) ve Firebase **şart değil**. Olmadan giriş, analiz ve görevler
 ### 1. Veritabanı
 
 ```sql
-CREATE DATABASE IF NOT EXISTS staj
+CREATE DATABASE IF NOT EXISTS CRM_AI
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_unicode_ci;
 ```

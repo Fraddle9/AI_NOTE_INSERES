@@ -4,7 +4,7 @@ from pathlib import Path
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-VARSAYILAN_DATABASE_URL = "mysql+pymysql://root:@localhost:3306/staj?charset=utf8mb4"
+VARSAYILAN_DATABASE_URL = "mysql+pymysql://root:@localhost:3306/CRM_AI?charset=utf8mb4"
 
 
 def _env_dosyasini_yukle(dosya: Path = Path(__file__).with_name(".env")) -> None:
