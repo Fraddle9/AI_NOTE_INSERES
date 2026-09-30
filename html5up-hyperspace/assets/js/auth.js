@@ -13,7 +13,7 @@
   var TOKEN_KEY   = 'crm-auth-token';
   var USER_KEY    = 'crm-auth-user';
   var LOGIN_PAGE  = 'login.html';
-  var API_BASE    = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, '');
+  var API_BASE    = (window.CRM_API_BASE || (window.location && window.location.origin) || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
   /* ── Yardımcılar ────────────────────────────────────────────────────── */
 

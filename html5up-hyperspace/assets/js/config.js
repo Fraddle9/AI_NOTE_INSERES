@@ -11,7 +11,7 @@
 	var host = (window.location && window.location.hostname) || '';
 	var proto = (window.location && window.location.protocol) || 'http:';
 	if (proto === 'file:') proto = 'http:';
-	var def = 'http://127.0.0.1:8000';
+	var def = (window.location && window.location.origin) ? window.location.origin : 'http://127.0.0.1:8000';
 	var pageIsLocal = !host || host === 'localhost' || host === '127.0.0.1';
 
 	function lanMi(h) {
@@ -24,8 +24,11 @@
 
 	if (stored) {
 		try {
-			var storedHost = new URL(stored).hostname;
-			if (pageIsLocal && lanMi(storedHost) && storedHost !== host) {
+			var storedUrl = new URL(stored);
+			var storedHost = storedUrl.hostname;
+			if ((pageIsLocal && lanMi(storedHost) && storedHost !== host) ||
+			    (!pageIsLocal && (storedHost !== host || (storedUrl.port === '8000' && window.location.port !== '8000'))) ||
+			    (proto === 'https:' && storedUrl.protocol === 'http:')) {
 				stored = null;
 				try { localStorage.removeItem('crm-api-base'); } catch (e2) {}
 			}
@@ -34,8 +37,12 @@
 		}
 	}
 
-	if (!stored && host && !pageIsLocal) {
-		def = proto + '//' + host + ':8000';
+	if (!stored) {
+		if (window.location.port === '8000') {
+			def = proto + '//' + host + ':8000';
+		} else if (host) {
+			def = window.location.origin;
+		}
 	}
 	window.CRM_API_BASE = String(stored || def).replace(/\/$/, '');
 })();

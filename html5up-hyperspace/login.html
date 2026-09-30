@@ -286,7 +286,7 @@
 			function apiIstek(yol, opts) {
 				return fetch(API_BASE + yol, opts).catch(function (err) {
 					if (!baglantiHatasiMi(err)) throw err;
-					var fallback = 'http://127.0.0.1:8000';
+					var fallback = (window.location && window.location.origin) ? window.location.origin : 'http://127.0.0.1:8000';
 					if (API_BASE.replace(/\/$/, '') === fallback) throw err;
 					return fetch(fallback + yol, opts).then(function (r) {
 						API_BASE = fallback;
