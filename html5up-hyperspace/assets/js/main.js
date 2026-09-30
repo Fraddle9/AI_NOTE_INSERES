@@ -2790,7 +2790,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		};
 	}
 
-	function gorevleriListeyeEkle(gorevler, label) {
+	function gorevleriListeyeEkle(gorevler, label, kurumAdi) {
 		var eklendi = 0;
 		var i, metin, extra, kayitli;
 		if (!Array.isArray(gorevler))
@@ -2804,7 +2804,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 				continue;
 			extra = {
 				label: gorevKaynagi(gorevler[i], label || 'AI Tespit Etti'),
-				kurum: (gorevler[i] && gorevler[i].kurum_adi) || '',
+				kurum: (gorevler[i] && gorevler[i].kurum_adi) || kurumAdi || '',
 				assigned_user_id: gorevler[i] && gorevler[i].assigned_user_id,
 				assigned_user_name: gorevler[i] && gorevler[i].assigned_user_name,
 				user_id: gorevler[i] && gorevler[i].user_id,
@@ -2988,13 +2988,16 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 
 			gorevleriListeyeEkle(
 				(data && Array.isArray(data.gorevler)) ? data.gorevler : [],
-				'AI Tespit Etti'
+				'AI Tespit Etti',
+				(data && (data.kurum_adi || (data.analiz && data.analiz.kurum_adi))) || ''
 			);
 
 			if (typeof window.loadGlobalStats === 'function')
 				window.loadGlobalStats();
 			if (typeof window.yukleKayitTablosu === 'function')
 				window.yukleKayitTablosu();
+			if (typeof window.crmGorevleriYenile === 'function')
+				window.crmGorevleriYenile();
 
 			// Analiz kaydı oluşunca detay çekmecesini hemen aç; kart tıklaması
 			// yedek kalsın. analiz_id yoksa eski davranış: özete kaydır.
@@ -4171,6 +4174,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		}
 		if (drawerNot)
 			drawerNot.textContent = kayit.not_icerigi || kayit.gecmis_not || 'Kayıtlı transkript yok.';
+		renderKayitGorevleri(kayit.gorevler, kayit.kurum_adi);
 		var adminDrawer = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
 		var curUser = window.Auth && window.Auth.getUser && window.Auth.getUser();
 		var userOwns = curUser && kayit.user_id && String(curUser.id) === String(kayit.user_id);
@@ -4679,6 +4683,10 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 	function renderKayitGorevleri(gorevler, kurumAdi) {
 		if (!gorevlerWrap || !gorevlerList)
 			return;
+		if (gorevler === undefined) {
+			if (gorevlerBos) gorevlerBos.hidden = true;
+			return;
+		}
 		// Yalnızca AI'nın bu görüşmeden çıkardığı To-Do notları
 		var gecerli = (Array.isArray(gorevler) ? gorevler : []).filter(function (g) {
 			if (!gorevBasligiAl(g))
