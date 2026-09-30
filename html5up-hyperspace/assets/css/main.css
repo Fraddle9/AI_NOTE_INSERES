@@ -8820,3 +8820,93 @@ html.crm-tema-acik .crm-sort-btn.is-filtered,
 html.crm-tema-acik .crm-filter-caret.is-on {
 	color: #ffffff;
 }
+
+/* ==========================================================================
+   Görüşme Kartı Silme Butonu - Mobil & Masaüstü Uyumlu Tasarım
+   ========================================================================== */
+.crm-mini-card {
+	position: relative !important;
+	padding-right: 3em !important;
+}
+
+button.crm-kart-sil-btn,
+.crm-kart-sil-btn {
+	position: absolute !important;
+	top: 0.85em !important;
+	right: 0.85em !important;
+	width: 28px !important;
+	height: 28px !important;
+	min-width: 28px !important;
+	max-width: 28px !important;
+	min-height: 28px !important;
+	max-height: 28px !important;
+	line-height: 28px !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	background: transparent !important;
+	border-radius: 6px !important;
+	color: rgba(255, 255, 255, 0.3) !important;
+	font-size: 13px !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	cursor: pointer !important;
+	z-index: 10 !important;
+	outline: none !important;
+	box-shadow: none !important;
+	transition: all 0.2s ease !important;
+}
+
+button.crm-kart-sil-btn:before,
+button.crm-kart-sil-btn:after {
+	display: none !important;
+	content: none !important;
+}
+
+button.crm-kart-sil-btn:hover,
+button.crm-kart-sil-btn:active {
+	background: rgba(224, 86, 122, 0.2) !important;
+	color: #ff6b8b !important;
+	transform: scale(1.12) !important;
+}
+
+button.crm-kart-sil-btn i,
+button.crm-kart-sil-btn svg,
+button.crm-kart-sil-btn .fa,
+button.crm-kart-sil-btn .fas {
+	font-size: 13px !important;
+	line-height: 1 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	pointer-events: none !important;
+}
+
+/* Açık Tema */
+html.crm-tema-acik button.crm-kart-sil-btn {
+	color: rgba(0, 0, 0, 0.35) !important;
+}
+
+html.crm-tema-acik button.crm-kart-sil-btn:hover {
+	background: rgba(224, 86, 122, 0.15) !important;
+	color: #d12e56 !important;
+}
+
+/* Mobil Ekranda (Dokunmatik Cihazlar için) */
+@media screen and (max-width: 736px) {
+	.crm-mini-card {
+		padding-right: 3.2em !important;
+	}
+	button.crm-kart-sil-btn {
+		top: 0.75em !important;
+		right: 0.75em !important;
+		width: 32px !important;
+		height: 32px !important;
+		min-width: 32px !important;
+		min-height: 32px !important;
+		font-size: 14px !important;
+		background: rgba(255, 255, 255, 0.05) !important;
+	}
+}

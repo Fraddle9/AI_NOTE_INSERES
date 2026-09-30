@@ -2561,7 +2561,9 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		}
 
 		hideError();
-		baseText = normalizeBase(textarea.value);
+		if (textarea)
+			textarea.value = '';
+		baseText = '';
 		frozenSpeech = '';
 
 		try {
@@ -3070,6 +3072,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 	var drawerHata = document.getElementById('drawer-hata');
 	var drawerHataMetni = document.getElementById('drawer-hata-metni');
 	var drawerDuzenle = document.getElementById('drawer-duzenle');
+	var drawerSil = document.getElementById('drawer-sil');
 	var dashKartlar = document.getElementById('dash-kartlar');
 	var notlarKartlar = document.getElementById('notlar-kartlar');
 	var sonKayitlar = [];
@@ -3641,12 +3644,18 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 			'</p>';
 			return;
 		}
+		var adminGorunumu = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
 		notlarKartlar.innerHTML = liste.map(function (k) {
 			var urunler = Array.isArray(k.ilgilenilen_urunler) && k.ilgilenilen_urunler.length
 				? k.ilgilenilen_urunler.join(', ')
 				: (k.urun_adi || '');
 			var not = notOzetAl(k);
+			var canSil = adminGorunumu || (window.Auth && window.Auth.getUser && window.Auth.getUser() && k.user_id && window.Auth.getUser().id === k.user_id);
+			var silBtnHtml = canSil
+				? '<button type="button" class="crm-kart-sil-btn" data-action="sil-kart" data-id="' + kacis(String(k.id || '')) + '" title="Görüşmeyi Sil" aria-label="Görüşmeyi Sil"><i class="fas fa-trash-alt"></i></button>'
+				: '';
 			return '<article class="crm-mini-card crm-not-kart" data-id="' + k.id + '" tabindex="0">' +
+				silBtnHtml +
 				'<span class="crm-mini-card-date">' + kacis(tarihYaz(k.tarih)) + '</span>' +
 				'<p class="crm-mini-card-kurum-etiket">Kurum</p>' +
 				'<h4>' + kacis(k.kurum_adi || 'Kurum belirtilmedi') + '</h4>' +
@@ -3702,7 +3711,12 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		var badgeHtml = (adminGorunumu && k.kullanici_adi)
 			? '<span class="crm-user-badge"><span class="icon fa-user"></span> ' + kacis(k.kullanici_adi) + '</span>'
 			: '';
+		var canSil = adminGorunumu || (window.Auth && window.Auth.getUser && window.Auth.getUser() && k.user_id && window.Auth.getUser().id === k.user_id);
+		var silBtnHtml = canSil
+			? '<button type="button" class="crm-kart-sil-btn" data-action="sil-kart" data-id="' + kacis(String(k.id || '')) + '" title="Görüşmeyi Sil" aria-label="Görüşmeyi Sil"><i class="fas fa-trash-alt"></i></button>'
+			: '';
 		return '<article class="crm-mini-card crm-gorusme-kart" data-id="' + kacis(String(k.id || '')) + '" tabindex="0">' +
+			silBtnHtml +
 			'<span class="crm-mini-card-date">' + kacis(tarihYaz(k.tarih)) + '</span>' +
 			'<p class="crm-mini-card-kurum-etiket">Kurum</p>' +
 			'<h4>' + kacis(k.kurum_adi || 'Kurum belirtilmedi') + '</h4>' +
@@ -4155,11 +4169,13 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		}
 		if (drawerNot)
 			drawerNot.textContent = kayit.not_icerigi || kayit.gecmis_not || 'Kayıtlı transkript yok.';
-		renderKayitGorevleri(kayit.gorevler, kayit.kurum_adi);
-		if (drawerDuzenle) {
-			var adminDrawer = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
-			drawerDuzenle.hidden = !drawerKayitId || !adminDrawer;
-		}
+		var adminDrawer = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
+		var userOwns = window.Auth && window.Auth.getUser && window.Auth.getUser() && kayit.user_id && window.Auth.getUser().id === kayit.user_id;
+		var canManage = adminDrawer || userOwns;
+		if (drawerDuzenle)
+			drawerDuzenle.hidden = !drawerKayitId || !canManage;
+		if (drawerSil)
+			drawerSil.hidden = !drawerKayitId || !canManage;
 	}
 
 	function detayCekmecesiniAc(id) {
@@ -4231,8 +4247,40 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 			});
 	}
 
+	function kayitSilOnayla(id) {
+		if (!id) return;
+		if (!window.confirm('Bu görüşme kaydını silmek istediğinize emin misiniz? Kayda ait görevler de kaldırılacaktır.'))
+			return;
+		apiDelete('/api/analizler/' + id)
+			.then(function () {
+				if (typeof drawerKapatHemen === 'function')
+					drawerKapatHemen();
+				yukleKayitTablosu();
+				if (typeof window.loadGlobalStats === 'function')
+					window.loadGlobalStats();
+				if (typeof window.gosterToast === 'function')
+					window.gosterToast('Görüşme kaydı silindi.', 'basari');
+			})
+			.catch(function (err) {
+				alert(err.message || 'Silme işlemi başarısız');
+			});
+	}
+
+	function kayitSilTiklama(e) {
+		var silBtn = e.target.closest ? e.target.closest('[data-action="sil-kart"]') : null;
+		if (silBtn) {
+			e.preventDefault();
+			e.stopPropagation();
+			var id = silBtn.getAttribute('data-id');
+			kayitSilOnayla(id);
+			return true;
+		}
+		return false;
+	}
+
 	if (dashKartlar) {
 		dashKartlar.addEventListener('click', function (e) {
+			if (kayitSilTiklama(e)) return;
 			var kart = e.target.closest ? e.target.closest('.crm-mini-card[data-id]') : null;
 			if (kart)
 				detayCekmecesiniAc(kart.getAttribute('data-id'));
@@ -4241,6 +4289,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 
 	if (notlarKartlar) {
 		notlarKartlar.addEventListener('click', function (e) {
+			if (kayitSilTiklama(e)) return;
 			var kart = e.target.closest ? e.target.closest('.crm-mini-card[data-id]') : null;
 			if (kart)
 				detayCekmecesiniAc(kart.getAttribute('data-id'));
@@ -4288,6 +4337,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 
 	if (gorusmeKartlar) {
 		gorusmeKartlar.addEventListener('click', function (e) {
+			if (kayitSilTiklama(e)) return;
 			var kart = e.target.closest ? e.target.closest('.crm-mini-card[data-id]') : null;
 			if (kart)
 				detayCekmecesiniAc(kart.getAttribute('data-id'));
@@ -5273,6 +5323,17 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 			}
 			drawerKapatHemen();
 			duzenlemeyiAc(id);
+		});
+	}
+	if (drawerSil) {
+		drawerSil.addEventListener('click', function () {
+			var id = drawerKayitId;
+			if (!id) {
+				if (typeof window.gosterToast === 'function')
+					window.gosterToast('Silinecek görüşme kaydı bulunamadı.', 'hata');
+				return;
+			}
+			kayitSilOnayla(id);
 		});
 	}
 	document.addEventListener('keydown', function (event) {
