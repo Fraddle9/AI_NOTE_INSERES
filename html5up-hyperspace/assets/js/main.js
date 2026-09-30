@@ -3650,7 +3650,8 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 				? k.ilgilenilen_urunler.join(', ')
 				: (k.urun_adi || '');
 			var not = notOzetAl(k);
-			var canSil = adminGorunumu || (window.Auth && window.Auth.getUser && window.Auth.getUser() && k.user_id && window.Auth.getUser().id === k.user_id);
+			var curUser = window.Auth && window.Auth.getUser && window.Auth.getUser();
+			var canSil = adminGorunumu || (curUser && k.user_id && String(curUser.id) === String(k.user_id));
 			var silBtnHtml = canSil
 				? '<button type="button" class="crm-kart-sil-btn" data-action="sil-kart" data-id="' + kacis(String(k.id || '')) + '" title="Görüşmeyi Sil" aria-label="Görüşmeyi Sil"><i class="fas fa-trash-alt"></i></button>'
 				: '';
@@ -3711,7 +3712,8 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		var badgeHtml = (adminGorunumu && k.kullanici_adi)
 			? '<span class="crm-user-badge"><span class="icon fa-user"></span> ' + kacis(k.kullanici_adi) + '</span>'
 			: '';
-		var canSil = adminGorunumu || (window.Auth && window.Auth.getUser && window.Auth.getUser() && k.user_id && window.Auth.getUser().id === k.user_id);
+		var curUser = window.Auth && window.Auth.getUser && window.Auth.getUser();
+		var canSil = adminGorunumu || (curUser && k.user_id && String(curUser.id) === String(k.user_id));
 		var silBtnHtml = canSil
 			? '<button type="button" class="crm-kart-sil-btn" data-action="sil-kart" data-id="' + kacis(String(k.id || '')) + '" title="Görüşmeyi Sil" aria-label="Görüşmeyi Sil"><i class="fas fa-trash-alt"></i></button>'
 			: '';
@@ -4170,7 +4172,8 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		if (drawerNot)
 			drawerNot.textContent = kayit.not_icerigi || kayit.gecmis_not || 'Kayıtlı transkript yok.';
 		var adminDrawer = window.Auth && window.Auth.isAdmin && window.Auth.isAdmin();
-		var userOwns = window.Auth && window.Auth.getUser && window.Auth.getUser() && kayit.user_id && window.Auth.getUser().id === kayit.user_id;
+		var curUser = window.Auth && window.Auth.getUser && window.Auth.getUser();
+		var userOwns = curUser && kayit.user_id && String(curUser.id) === String(kayit.user_id);
 		var canManage = adminDrawer || userOwns;
 		if (drawerDuzenle)
 			drawerDuzenle.hidden = !drawerKayitId || !canManage;
@@ -4179,6 +4182,8 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 	}
 
 	function detayCekmecesiniAc(id) {
+		drawerKayitId = id;
+		if (drawer) drawer.setAttribute('data-id', String(id));
 		var yerel = kayitCache[String(id)];
 		if (drawerIcerik) drawerIcerik.hidden = !yerel;
 		if (drawerHata) drawerHata.hidden = true;
@@ -4247,23 +4252,94 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 			});
 	}
 
-	function kayitSilOnayla(id) {
-		if (!id) return;
-		if (!window.confirm('Bu görüşme kaydını silmek istediğinize emin misiniz? Kayda ait görevler de kaldırılacaktır.'))
+	function crmOnayDialog(ayarlar) {
+		var modal = document.getElementById('crm-onay-modal');
+		var baslikEl = document.getElementById('crm-onay-baslik');
+		var mesajEl = document.getElementById('crm-onay-mesaj');
+		var evetBtn = document.getElementById('crm-onay-evet');
+		var iptalBtn = document.getElementById('crm-onay-iptal');
+		if (!modal) {
+			if (window.confirm((ayarlar && ayarlar.mesaj) || 'Emin misiniz?')) {
+				if (ayarlar && typeof ayarlar.onay === 'function') ayarlar.onay();
+			}
 			return;
-		apiDelete('/api/analizler/' + id)
-			.then(function () {
-				if (typeof drawerKapatHemen === 'function')
-					drawerKapatHemen();
-				yukleKayitTablosu();
-				if (typeof window.loadGlobalStats === 'function')
-					window.loadGlobalStats();
-				if (typeof window.gosterToast === 'function')
-					window.gosterToast('Görüşme kaydı silindi.', 'basari');
-			})
-			.catch(function (err) {
-				alert(err.message || 'Silme işlemi başarısız');
-			});
+		}
+		if (baslikEl && ayarlar.baslik) baslikEl.textContent = ayarlar.baslik;
+		if (mesajEl && ayarlar.mesaj) mesajEl.textContent = ayarlar.mesaj;
+		if (evetBtn && ayarlar.buton) evetBtn.textContent = ayarlar.buton;
+
+		modal.hidden = false;
+
+		function temizle() {
+			modal.hidden = true;
+			if (evetBtn) evetBtn.removeEventListener('click', onEvet);
+			if (iptalBtn) iptalBtn.removeEventListener('click', onIptal);
+			modal.removeEventListener('click', onBackdrop);
+		}
+
+		function onEvet(e) {
+			if (e) { e.preventDefault(); e.stopPropagation(); }
+			temizle();
+			if (ayarlar && typeof ayarlar.onay === 'function') ayarlar.onay();
+		}
+
+		function onIptal(e) {
+			if (e) { e.preventDefault(); e.stopPropagation(); }
+			temizle();
+			if (ayarlar && typeof ayarlar.iptal === 'function') ayarlar.iptal();
+		}
+
+		function onBackdrop(e) {
+			if (e.target && e.target.hasAttribute('data-close-onay-modal')) {
+				if (e) { e.preventDefault(); e.stopPropagation(); }
+				temizle();
+			}
+		}
+
+		if (evetBtn) evetBtn.addEventListener('click', onEvet);
+		if (iptalBtn) iptalBtn.addEventListener('click', onIptal);
+		modal.addEventListener('click', onBackdrop);
+	}
+
+	function kayitSilOnayla(id) {
+		if (!id) {
+			if (typeof window.gosterToast === 'function')
+				window.gosterToast('Silinecek görüşme kaydı bulunamadı.', 'hata');
+			return;
+		}
+		crmOnayDialog({
+			baslik: 'Görüşmeyi Sil',
+			mesaj: 'Bu görüşme kaydını silmek istediğinize emin misiniz? Kayda ait görevler de kaldırılacaktır.',
+			buton: 'Evet, Sil',
+			onay: function () {
+				apiDelete('/api/analizler/' + id)
+					.then(function () {
+						if (typeof drawerKapatHemen === 'function')
+							drawerKapatHemen();
+						var dr = document.getElementById('kayit-drawer');
+						if (dr) {
+							dr.classList.remove('is-open');
+							dr.hidden = true;
+						}
+						delete kayitCache[String(id)];
+						sonKayitlar = (sonKayitlar || []).filter(function (k) { return String(k.id) !== String(id); });
+						renderDashKartlar(sonKayitlar);
+						renderNotlarKartlar(sonKayitlar);
+						renderGorusmeKartlar(sonKayitlar);
+						yukleKayitTablosu();
+						if (typeof window.loadGlobalStats === 'function')
+							window.loadGlobalStats();
+						if (typeof window.gosterToast === 'function')
+							window.gosterToast('Görüşme kaydı silindi.', 'ok');
+					})
+					.catch(function (err) {
+						if (typeof window.gosterToast === 'function')
+							window.gosterToast((err && err.message) || 'Silme işlemi başarısız', 'hata');
+						else
+							alert((err && err.message) || 'Silme işlemi başarısız');
+					});
+			}
+		});
 	}
 
 	function kayitSilTiklama(e) {
@@ -5235,18 +5311,7 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 			e.preventDefault();
 			e.stopPropagation();
 			var silId = sil.getAttribute('data-id');
-			if (!window.confirm('Bu kaydı silmek istiyor musunuz? Kayıt kalıcı silinmez, listeden kaldırılır.'))
-				return;
-			fetch(API_BASE + '/api/analizler/' + silId, { method: 'DELETE', headers: { Accept: 'application/json' } })
-				.then(function (r) { return r.text().then(function (raw) { return jsonAl(r, raw); }); })
-				.then(function () {
-					yukleKayitTablosu();
-					if (typeof window.loadGlobalStats === 'function')
-						window.loadGlobalStats();
-				})
-				.catch(function (err) {
-					alert(err.message || 'Silme başarısız');
-				});
+			kayitSilOnayla(silId);
 			return;
 		}
 		var satir = hedef.closest('tr[data-id]');
@@ -5326,8 +5391,12 @@ var CRM_API = (window.CRM_API_BASE || 'http://127.0.0.1:8000').replace(/\/$/, ''
 		});
 	}
 	if (drawerSil) {
-		drawerSil.addEventListener('click', function () {
-			var id = drawerKayitId;
+		drawerSil.addEventListener('click', function (e) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			var id = drawerKayitId || (drawer && drawer.getAttribute('data-id'));
 			if (!id) {
 				if (typeof window.gosterToast === 'function')
 					window.gosterToast('Silinecek görüşme kaydı bulunamadı.', 'hata');

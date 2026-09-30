@@ -9,7 +9,7 @@
 		<title>CRM Analiz Portalı</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css?v=20260930b" />
+		<link rel="stylesheet" href="assets/css/main.css?v=20260930d" />
 		<link rel="stylesheet" href="assets/css/stars.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<script>
@@ -983,6 +983,24 @@
 			</div>
 		</div>
 
+		<!-- Özel İşlem Onay Modalı (Native popup yerine mobil uyumlu modern in-app dialog) -->
+		<div id="crm-onay-modal" class="crm-modal" hidden style="z-index: 10090;">
+			<div class="crm-modal-backdrop" data-close-onay-modal></div>
+			<div class="crm-modal-dialog box" role="dialog" aria-modal="true" style="max-width: 26em; text-align: center; padding: 2em 1.5em; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 16px 40px rgba(0,0,0,0.6);">
+				<div style="font-size: 2.4em; color: #e0567a; margin-bottom: 0.3em; line-height: 1;">
+					<i class="fas fa-trash-alt"></i>
+				</div>
+				<h3 id="crm-onay-baslik" style="margin-bottom: 0.4em; font-size: 1.25em;">Görüşmeyi Sil</h3>
+				<p id="crm-onay-mesaj" style="color: rgba(255,255,255,0.75); font-size: 0.95em; line-height: 1.5; margin-bottom: 1.5em;">
+					Bu görüşme kaydını silmek istediğinize emin misiniz? Kayda ait görevler de kaldırılacaktır.
+				</p>
+				<ul class="actions" style="justify-content: center; gap: 0.8em; margin: 0; display: flex; flex-wrap: wrap;">
+					<li><button type="button" id="crm-onay-iptal" class="button" style="min-width: 7.5em;">Vazgeç</button></li>
+					<li><button type="button" id="crm-onay-evet" class="button primary" style="min-width: 7.5em; background-color: #e0567a !important; border-color: #e0567a !important; color: #fff !important;">Evet, Sil</button></li>
+				</ul>
+			</div>
+		</div>
+
 		<script src="assets/js/jquery.min.js"></script>
 		<script src="assets/js/jquery.scrollex.min.js"></script>
 		<script src="assets/js/jquery.scrolly.min.js"></script>
@@ -991,7 +1009,7 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/os-notify.js?v=20260828s"></script>
 		<script src="assets/js/web-fcm.js?v=20260828s"></script>
-		<script src="assets/js/main.js?v=20260831d"></script>
+		<script src="assets/js/main.js?v=20260930d"></script>
 
 		<div id="crm-col-filter-popover" class="crm-col-filter-popover" hidden role="dialog" aria-modal="false">
 			<p class="crm-col-filter-title"></p>
